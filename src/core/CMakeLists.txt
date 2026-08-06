@@ -4,6 +4,7 @@ target_sources(core PRIVATE
     logger/Logger.cpp
     filesystem/Filesystem.cpp
     settings/Settings.cpp
+    #project/Project.cpp
 )
 
 target_include_directories(core PUBLIC
