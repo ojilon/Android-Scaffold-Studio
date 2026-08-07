@@ -1,0 +1,31 @@
+plugins {
+
+    id 'com.android.application'
+
+}
+
+android {
+
+    namespace "${PACKAGE_NAME}"
+
+    compileSdk ${COMPILE_SDK}
+
+    defaultConfig {
+
+        applicationId "${PACKAGE_NAME}"
+
+        minSdk ${MIN_SDK}
+
+        targetSdk ${TARGET_SDK}
+
+        versionCode ${VERSION_CODE}
+
+        versionName "${VERSION_NAME}"
+
+    }
+
+}
+
+dependencies {
+
+}
