@@ -24,7 +24,7 @@ core::Result<GenerationResult, std::string> generate(const parser::AppModel& mod
     xml << "<!-- asstudio:generated v1 DO NOT EDIT -->\n";
     
     // Assuming single screen for v1 golden sample logic
-    if (model.screens.empty()) return core::error("No screens in model");
+    if (model.screens.empty()) return std::unexpected<std::string>("No screens in model");
     const auto& screen = model.screens[0];
     
     xml << "<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n";
@@ -134,7 +134,7 @@ core::Result<GenerationResult, std::string> generate(const parser::AppModel& mod
     manifest << "</manifest>";
     result.manifest_xml = manifest.str();
 
-    return core::ok(result);
+    return result;
 }
 
 } // namespace codegen

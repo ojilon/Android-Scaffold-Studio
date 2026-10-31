@@ -6,7 +6,6 @@
 #include <regex>
 
 using json = nlohmann::json;
-using namespace parser;
 
 namespace validator {
 
@@ -24,7 +23,7 @@ core::Result<void, std::vector<RuleViolation>> Validator::validate(const std::st
         j = json::parse(json_content);
     } catch (const json::parse_error& e) {
         violations.push_back({"PARSE_ERROR", "$", e.what(), "Error"});
-        return core::error(violations);
+        return std::unexpected<std::vector<RuleViolation>>(violations);
     }
 
     // V004: package name is a valid Java package; app name non-empty
@@ -141,9 +140,9 @@ core::Result<void, std::vector<RuleViolation>> Validator::validate(const std::st
     }
 
     if (violations.empty()) {
-        return core::ok();
+        return {};
     } else {
-        return core::error(violations);
+        return std::unexpected<std::vector<RuleViolation>>(violations);
     }
 }
 

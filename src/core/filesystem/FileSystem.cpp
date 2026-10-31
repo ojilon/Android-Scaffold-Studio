@@ -50,8 +50,8 @@ namespace filesystem {
         return result;
     }
 
-    result::Result<std::vector<Path>>
-    filesystem::list_directory(
+    expected::Result<std::vector<Path>>
+    list_directory(
         const Path& path)
     {
         std::error_code ec;

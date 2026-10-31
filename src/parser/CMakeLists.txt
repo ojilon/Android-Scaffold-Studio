@@ -8,7 +8,6 @@ target_sources(parser PRIVATE
     tree/TreeUtils.cpp
     xml/Xml.cpp
     xml/XmlAttribute.cpp
-    xml/XmlInternal.cpp
     xml/XmlReader.cpp
     xml/XmlWriter.cpp
     AppModelLoader.cpp

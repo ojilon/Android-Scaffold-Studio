@@ -13,14 +13,16 @@ namespace parser {
 core::Result<AppModel, std::vector<ParseError>> loadModel(const std::string& filepath) {
     std::ifstream file(filepath);
     if (!file.is_open()) {
-        return core::error({ParseError{"FILE_NOT_FOUND", "$.", "Could not open file: " + filepath}});
+        return std::unexpected<std::vector<ParseError>>(
+            {ParseError{"FILE_NOT_FOUND", "$.", "Could not open file: " + filepath}});
     }
 
     json j;
     try {
         file >> j;
     } catch (const json::parse_error& e) {
-        return core::error({ParseError{"JSON_PARSE_ERROR", "$.", e.what()}});
+        return std::unexpected<std::vector<ParseError>>(
+            {ParseError{"JSON_PARSE_ERROR", "$.", e.what()}});
     }
 
     AppModel model;
@@ -29,7 +31,8 @@ core::Result<AppModel, std::vector<ParseError>> loadModel(const std::string& fil
     if (j.contains("schemaVersion")) {
         model.schemaVersion = j["schemaVersion"].get<int>();
     } else {
-        return core::error({ParseError{"MISSING_FIELD", "$.schemaVersion", "schemaVersion is required"}});
+        return std::unexpected<std::vector<ParseError>>(
+            {ParseError{"MISSING_FIELD", "$.schemaVersion", "schemaVersion is required"}});
     }
 
     // app
@@ -38,15 +41,18 @@ core::Result<AppModel, std::vector<ParseError>> loadModel(const std::string& fil
         model.app.name = app_j.value("name", "");
         model.app.package = app_j.value("package", "");
         model.app.minSdk = app_j.value("minSdk", 0);
-        
+
         if (model.app.name.empty()) {
-            return core::error({ParseError{"INVALID_VALUE", "$.app.name", "app name cannot be empty"}});
+            return std::unexpected<std::vector<ParseError>>(
+                {ParseError{"INVALID_VALUE", "$.app.name", "app name cannot be empty"}});
         }
         if (model.app.package.empty()) {
-            return core::error({ParseError{"INVALID_VALUE", "$.app.package", "package name cannot be empty"}});
+            return std::unexpected<std::vector<ParseError>>(
+                {ParseError{"INVALID_VALUE", "$.app.package", "package name cannot be empty"}});
         }
     } else {
-        return core::error({ParseError{"MISSING_FIELD", "$.app", "app object is required"}});
+        return std::unexpected<std::vector<ParseError>>(
+            {ParseError{"MISSING_FIELD", "$.app", "app object is required"}});
     }
 
     // screens
@@ -54,10 +60,11 @@ core::Result<AppModel, std::vector<ParseError>> loadModel(const std::string& fil
         for (size_t i = 0; i < j["screens"].size(); ++i) {
             const auto& screen_j = j["screens"][i];
             Screen screen;
-            
+
             screen.id = screen_j.value("id", "");
             if (screen.id.empty()) {
-                return core::error({ParseError{"MISSING_FIELD", "$.screens[" + std::to_string(i) + "].id", "screen id is required"}});
+                return std::unexpected<std::vector<ParseError>>(
+                    {ParseError{"MISSING_FIELD", "$.screens[" + std::to_string(i) + "].id", "screen id is required"}});
             }
 
             // states
@@ -71,9 +78,11 @@ core::Result<AppModel, std::vector<ParseError>> loadModel(const std::string& fil
             if (screen_j.contains("layout")) {
                 const auto& layout_j = screen_j["layout"];
                 screen.layout.type = layout_j.value("type", "");
-                
+
                 if (screen.layout.type.empty()) {
-                    return core::error({ParseError{"MISSING_FIELD", "$.screens[" + std::to_string(i) + "].layout.type", "layout type is required"}});
+                    return std::unexpected<std::vector<ParseError>>(
+                        {ParseError{"MISSING_FIELD", "$.screens[" + std::to_string(i) + "].layout.type",
+                                    "layout type is required"}});
                 }
 
                 if (layout_j.contains("children") && layout_j["children"].is_array()) {
@@ -95,7 +104,7 @@ core::Result<AppModel, std::vector<ParseError>> loadModel(const std::string& fil
         }
     }
 
-    return core::ok(model);
+    return model;
 }
 
 } // namespace parser
