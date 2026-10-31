@@ -49,7 +49,7 @@ model.json -> load -> VALIDATE (Android rules) -> codegen (templates) -> files -
 
 `core` and the model know nothing about UI. Layers: `core` <- `model/parser` <- `validator` <- `codegen/scaffolder`. `designer`, `rendering`, `ui` sit on top later and only edit the model. Nothing in `core`, `parser`, `scaffolder` or `codegen` may depend on `ui`, `rendering`, or `designer`.
 
-Use the existing folders (`src/core`, `src/parser`, `src/scaffolder`, `src/codegen`, ...). If a validator folder does not exist, create `src/validator`. **Fix the typo folder `src/scaffolder/reoursce`** (use `git mv`; check CMake references).
+Use the existing folders (`src/core`, `src/parser`, `src/scaffolder`, `src/codegen`, ...). If a validator folder does not exist, create `src/validator`. **Fix the typo folder `src/scaffolder/resource`** (use `git mv`; check CMake references).
 
 ### Generated vs user-owned split (key idea)
 

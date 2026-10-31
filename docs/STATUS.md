@@ -8,7 +8,7 @@
 ### 1. Inspect and Report (IN PROGRESS)
 - Repo state summarized below.
 - Concept images inspected: `docs/concepts/android-scaffold-studio-code-split.png`, `android-scaffold-studio-main-window.png`, `android-scaffold-studio-template-library.png`.
-- Existing skeleton: CMake build, `src/core`, `src/parser`, `src/scaffolder` (with typo `reoursce`), `src/app`, templates, samples.
+- Existing skeleton: CMake build, `src/core`, `src/parser`, `src/scaffolder` (with typo `resource`), `src/app`, templates, samples.
 
 ### 2. Golden Sample First (PENDING)
 - Hand-write expected output for `samples/hello.json` in `docs/golden/hello/` (layout XML, `HomeScreenBase.java`, `HomeActivity.java`, manifest).
@@ -16,7 +16,7 @@
 ### 3. Build System (PENDING)
 - Make CMake configure and build cleanly with targets/layers.
 - Add `ctest`.
-- Fix `src/scaffolder/reoursce` typo.
+- Fix `src/scaffolder/resource` typo.
 
 ### 4. Model + Loader (PENDING)
 - Parse `samples/hello.json` into C++ structs.
@@ -60,11 +60,11 @@
 - `cat CMakeLists.txt` -> CMake configuration inspected
 
 ## Known Problems
-- Typo in folder name: `src/scaffolder/reoursce` needs fixing (`git mv`).
+- Typo in folder name: `src/scaffolder/resource` needs fixing (`git mv`).
 - Third-party libraries (`nlohmann/json`, `pugixml`, `doctest`) need vendoring into `third_party/` with versions/licenses.
 - C++ toolchain detection and installation pending.
 
 ## Next Three Suggested Steps
-1. Fix the `src/scaffolder/reoursce` typo and update CMake references.
+1. Fix the `src/scaffolder/resource` typo and update CMake references.
 2. Vendor third-party libraries into `third_party/` and update `third_party/README.md`.
 3. Create `docs/golden/hello/` with expected Android artifacts for the `samples/hello.json` golden sample.

@@ -13,7 +13,7 @@ Nothing in `core`, `parser`, `scaffolder` or `codegen` may depend on `ui`, `rend
 
 Use existing folders (`src/core`, `src/parser`, `src/scaffolder`, `src/codegen`, ...).
 Create `src/validator` if missing.
-Fix the typo folder `src/scaffolder/reoursce` (use `git mv`; check CMake references).
+Fix the typo folder `src/scaffolder/resource` (use `git mv`; check CMake references).
 
 ## Generated vs User-Owned Split (Key Idea)
 For each screen the generator emits:
