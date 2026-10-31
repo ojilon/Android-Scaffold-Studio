@@ -22,6 +22,7 @@ include(Utils)
 
 #add static libraries
 add_subdirectory(src/core)
+add_subdirectory(src/validator)
 
 add_executable(
     AndroidScaffoldStudio
@@ -32,6 +33,7 @@ add_executable(
 target_link_libraries(AndroidScaffoldStudio
     PRIVATE
     core
+    validator
 )
 
 #target_apply_compiler_options(AndroidScaffoldStudio)
