@@ -1,138 +1,142 @@
-#include "codegen/Scaffolder.h"
-#include "parser/AppModel.h"
-#include <core/Result.h>
-#include <string>
+#include <codegen/Scaffolder.h>
+
+#include <cctype>
 #include <sstream>
+#include <string>
 
 namespace codegen {
 
-// Simple template substitution {{dotted.path}}
-std::string render(const std::string& tmpl, const parser::AppModel& model) {
-    std::string res = tmpl;
-    // Basic substitution logic for Phase 1
-    // In a real implementation, we'd use a proper renderer or string replacement
-    // For now, we'll hardcode the golden sample generation logic based on the prompt's specific v1 requirements
-    return res;
+namespace {
+
+std::string capitalize_first(std::string s) {
+    if (!s.empty())
+        s[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(s[0])));
+    return s;
 }
 
-core::Result<GenerationResult, std::string> generate(const parser::AppModel& model) {
+} // anonymous
+
+core::Result<GenerationResult, std::string>
+generate(const parser::AppModel& model) {
+
+    if (model.screens.empty())
+        return std::unexpected("no screens in model");
+
+    const auto& screen = model.screens[0];   // v1: only first screen
+
     GenerationResult result;
 
-    // 1. Layout XML
-    std::stringstream xml;
+    // ---------- 1. layout XML ----------
+    std::ostringstream xml;
     xml << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
     xml << "<!-- asstudio:generated v1 DO NOT EDIT -->\n";
-    
-    // Assuming single screen for v1 golden sample logic
-    if (model.screens.empty()) return std::unexpected<std::string>("No screens in model");
-    const auto& screen = model.screens[0];
-    
     xml << "<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n";
     xml << "    android:layout_width=\"match_parent\"\n";
     xml << "    android:layout_height=\"match_parent\"\n";
-    xml << "    android:orientation=\"";
-    xml << (screen.layout.type == "column" ? "vertical" : "horizontal") << "\">\n";
+    xml << "    android:orientation=\""
+        << (screen.layout.type == "column" ? "vertical" : "horizontal")
+        << "\">\n";
 
     for (const auto& child : screen.layout.children) {
         if (child.type == "text") {
-            xml << "    <TextView\n";
-            xml << "        android:id=\"@+id/" << child.id << "\"\n";
-            xml << "        android:layout_width=\"wrap_content\"\n";
-            xml << "        android:layout_height=\"wrap_content\"\n";
-            xml << "        android:text=\"" << child.text << "\" />\n";
+            xml << "    <TextView\n"
+                << "        android:id=\"@+id/" << child.id << "\"\n"
+                << "        android:layout_width=\"wrap_content\"\n"
+                << "        android:layout_height=\"wrap_content\"\n"
+                << "        android:text=\"" << child.text << "\" />\n";
         } else if (child.type == "button") {
-            xml << "    <Button\n";
-            xml << "        android:id=\"@+id/" << child.id << "\"\n";
-            xml << "        android:layout_width=\"wrap_content\"\n";
-            xml << "        android:layout_height=\"wrap_content\"\n";
-            xml << "        android:text=\"" << child.text << "\" />\n";
+            xml << "    <Button\n"
+                << "        android:id=\"@+id/" << child.id << "\"\n"
+                << "        android:layout_width=\"wrap_content\"\n"
+                << "        android:layout_height=\"wrap_content\"\n"
+                << "        android:text=\"" << child.text << "\" />\n";
         }
-        // Other types (column, row, input, image, spacer) omitted for v1 golden sample simplicity
+        // other types omitted for v1
     }
-    xml << "</LinearLayout>";
+    xml << "</LinearLayout>\n";
     result.layout_xml = xml.str();
 
-    // 2. HomeScreenBase.java
-    std::stringstream base_java;
-    base_java << "// asstudio:generated v1 DO NOT EDIT\n";
-    base_java << "package " << model.app.package << ";\n\n";
-    base_java << "import android.os.Bundle;\n";
-    base_java << "import android.view.View;\n";
-    base_java << "import android.widget.Button;\n";
-    base_java << "import android.widget.TextView;\n";
-    base_java << "import androidx.appcompat.app.AppCompatActivity;\n\n";
-    
-    std::string className = screen.id;
-    className[0] = std::toupper(className[0]); // capitalize
-    className += "ScreenBase";
+    // ---------- 2. ScreenBase.java ----------
+    std::string base_name = capitalize_first(screen.id) + "ScreenBase";
+    std::string act_name  = capitalize_first(screen.id) + "Activity";
 
-    base_java << "public class " << className << " extends AppCompatActivity {\n";
-    
-    // Fields
+    std::ostringstream base;
+    base << "// asstudio:generated v1 DO NOT EDIT\n"
+         << "package " << model.app.package << ";\n\n"
+         << "import android.os.Bundle;\n"
+         << "import android.view.View;\n"
+         << "import android.widget.Button;\n"
+         << "import android.widget.TextView;\n"
+         << "import androidx.appcompat.app.AppCompatActivity;\n\n"
+         << "public class " << base_name << " extends AppCompatActivity {\n";
+
     for (const auto& child : screen.layout.children) {
-        if (child.type == "text") base_java << "    protected TextView " << child.id << ";\n";
-        else if (child.type == "button") base_java << "    protected Button " << child.id << ";\n";
+        if (child.type == "text")
+            base << "    protected TextView " << child.id << ";\n";
+        else if (child.type == "button")
+            base << "    protected Button " << child.id << ";\n";
     }
 
-    base_java << "\n    @Override\n";
-    base_java << "    protected void onCreate(Bundle savedInstanceState) {\n";
-    base_java << "        super.onCreate(savedInstanceState);\n";
-    base_java << "        setContentView(R.layout.res_layout_" << screen.id << ");\n\n";
-    
+    base << "\n    @Override\n"
+         << "    protected void onCreate(Bundle savedInstanceState) {\n"
+         << "        super.onCreate(savedInstanceState);\n"
+         << "        setContentView(R.layout.res_layout_" << screen.id << ");\n\n";
+
     for (const auto& child : screen.layout.children) {
-        base_java << "        " << child.id << " = findViewById(R.id." << child.id << ");\n";
+        base << "        " << child.id << " = findViewById(R.id." << child.id << ");\n";
         if (child.type == "button" && !child.onClick.empty()) {
-            base_java << "        " << child.id << ".setOnClickListener(v -> on" << child.onClick << "());\n";
+            base << "        " << child.id
+                 << ".setOnClickListener(v -> on" << child.onClick << "());\n";
         }
     }
-    base_java << "    }\n\n";
+    base << "    }\n\n";
 
-    // Abstract handlers
     for (const auto& child : screen.layout.children) {
         if (child.type == "button" && !child.onClick.empty()) {
-            base_java << "    protected void on" << child.onClick << "() {\n";
-            base_java << "        // abstract handler\n";
-            base_java << "    }\n";
+            base << "    protected void on" << child.onClick << "() {\n"
+                 << "        // abstract handler – override in Activity\n"
+                 << "    }\n";
         }
     }
 
-    base_java << "\n    public void setState(String state) {\n";
-    base_java << "        // state handling logic (loading, content, error)\n";
-    base_java << "    }\n";
-    base_java << "}\n";
-    result.screen_base_java = base_java.str();
+    base << "\n    public void setState(String state) {\n"
+         << "        // loading / content / error\n"
+         << "    }\n"
+         << "}\n";
+    result.screen_base_java = base.str();
 
-    // 3. HomeActivity.java (User-owned template)
-    std::stringstream act_java;
-    act_java << "package " << model.app.package << ";\n\n";
-    act_java << "public class " << className << "Activity extends " << className << " {\n";
+    // ---------- 3. Activity.java (user-owned) ----------
+    std::ostringstream act;
+    act << "package " << model.app.package << ";\n\n"
+        << "public class " << act_name << " extends " << base_name << " {\n";
+
     for (const auto& child : screen.layout.children) {
         if (child.type == "button" && !child.onClick.empty()) {
-            act_java << "    @Override\n";
-            act_java << "    protected void on" << child.onClick << "() {\n";
-            act_java << "        // User-owned implementation\n";
-            act_java << "    }\n";
+            act << "    @Override\n"
+                << "    protected void on" << child.onClick << "() {\n"
+                << "        // TODO: user implementation\n"
+                << "    }\n";
         }
     }
-    act_java << "}\n";
-    result.activity_java = act_java.str();
+    act << "}\n";
+    result.activity_java = act.str();
 
-    // 4. AndroidManifest.xml
-    std::stringstream manifest;
-    manifest << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-    manifest << "<!-- asstudio:generated v1 DO NOT EDIT -->\n";
-    manifest << "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n";
-    manifest << "    package=\"" << model.app.package << "\">\n\n";
-    manifest << "    <application>\n";
-    manifest << "        <activity android:name=\".\"" << className << "Activity\">\n";
-    manifest << "            <intent-filter>\n";
-    manifest << "                <action android:name=\"android.intent.action.MAIN\" />\n";
-    manifest << "                <category android:name=\"android.intent.category.LAUNCHER\" />\n";
-    manifest << "            </intent-filter>\n";
-    manifest << "        </activity>\n";
-    manifest << "    </application>\n";
-    manifest << "</manifest>";
-    result.manifest_xml = manifest.str();
+    // ---------- 4. AndroidManifest.xml ----------
+    std::ostringstream man;
+    man << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+        << "<!-- asstudio:generated v1 DO NOT EDIT -->\n"
+        << "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n"
+        << "    package=\"" << model.app.package << "\">\n\n"
+        << "    <application>\n"
+        << "        <activity android:name=\"." << act_name << "\">\n"
+        << "            <intent-filter>\n"
+        << "                <action android:name=\"android.intent.action.MAIN\" />\n"
+        << "                <category android:name=\"android.intent.category.LAUNCHER\" />\n"
+        << "            </intent-filter>\n"
+        << "        </activity>\n"
+        << "    </application>\n"
+        << "</manifest>\n";
+    result.manifest_xml = man.str();
 
     return result;
 }

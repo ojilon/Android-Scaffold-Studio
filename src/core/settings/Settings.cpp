@@ -1,30 +1,20 @@
 #include <core/Settings.h>
-#include <core/Result.h>
 
 namespace settings {
 
-    Settings defaults() {
-        Settings default_settings;
-        
-        // dark_theme is automatically true because of the header initialization.
-        // You only need to explicitly assign it here if you want to be defensive:
-        default_settings.dark_theme = true; 
-        
-        // Initialize your path directories here if needed, for example:
-        // default_settings.sdk_directory = "path/to/sdk";
+Settings defaults() {
+    Settings s;
+    s.dark_theme = true;
+    // leave paths empty for now
+    return s;
+}
 
-        return default_settings;
-    }
+core::VoidResult save(const Settings& /*s*/, const filesystem::Path& /*path*/) {
+    return std::unexpected("settings::save not implemented yet");
+}
 
-    // Stub implementations for your save and load functions
-    result::VoidResult save(const Settings& s, const filesystem::Path& p) {
-        // Your save logic here
-        return std::unexpected("Not implemented"); 
-    }
-
-    result::Result<Settings> load(const filesystem::Path& p) {
-        // Your load logic here
-        std::unexpected("Not implemented");
-    }
+core::Result<Settings> load(const filesystem::Path& /*path*/) {
+    return std::unexpected("settings::load not implemented yet");
+}
 
 } // namespace settings

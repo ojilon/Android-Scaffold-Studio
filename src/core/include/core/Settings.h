@@ -1,25 +1,20 @@
 #pragma once
 
-#include <core/Filesystem.h>
+#include <core/FileSystem.h>
 #include <core/Result.h>
 
 namespace settings {
-    struct Settings {
-        filesystem::Path sdk_directory;
-        filesystem::Path ndk_directory;
-        filesystem::Path projects_directory;
-        bool dark_theme = true;
-    };
 
-    Settings defaults();
+struct Settings {
+    filesystem::Path sdk_directory;
+    filesystem::Path ndk_directory;
+    filesystem::Path projects_directory;
+    bool dark_theme = true;
+};
 
-    result::VoidResult save(
-        const Settings&,
-        const filesystem::Path&
-    );
+Settings defaults();
 
-    result::Result<Settings> load(
-        const filesystem::Path&
-    );
+core::VoidResult save(const Settings& s, const filesystem::Path& path);
+core::Result<Settings> load(const filesystem::Path& path);
 
-}
+} // namespace settings
