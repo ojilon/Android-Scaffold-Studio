@@ -1,0 +1,17 @@
+// asstudio:generated v1 DO NOT EDIT
+package {{app.package}};
+
+{{java.imports}}
+
+{{screen.modifiers}} class {{screen.className}} extends AppCompatActivity {
+{{screen.fields}}
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.{{screen.layoutName}});
+{{screen.findViews}}
+{{screen.listeners}}
+{{screen.initialState}}    }
+{{screen.handlers}}
+{{screen.setState}}}

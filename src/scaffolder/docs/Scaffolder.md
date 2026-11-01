@@ -2,96 +2,38 @@
 
 ## Pipeline
 
-Project Model
-
-↓
-
-Directory Builder
-
-↓
-
-Template Engine
-
-↓
-
-Project Writer
-
-↓
-
-Android Project
-
----
-
-## Generated Files
-
-AndroidManifest.xml
-
-build.gradle
-
-settings.gradle
-
-gradle.properties
-
-local.properties
-
-proguard-rules.pro
-
-res/
-
-src/
-
-assets/
-
-libs/
-
----
-
-## Design Goals
-
-The scaffolder should never hardcode file contents.
-
-Every generated file comes from a reusable template.
-
-This allows users to customize templates without changing C++ code.
-
-Future versions may support multiple template packs:
-
-- Android App
-- Android Library
-- Jetpack Compose
-- JNI
-- Multi-module
-
-## Template System
-
-The scaffolder never generates Android files directly.
-
-Instead it follows this pipeline.
-
 ```
-Template
-
-↓
-
-Load
-
-↓
-
-Replace Variables
-
-↓
-
-Write File
+templates/  ->  scaffolder::load_templates()  ->  codegen::TemplateSet
+model.json  ->  parser + validator            ->  parser::AppModel
+                        |
+                        v
+              codegen::generate(model, templates)   (pure, no disk)
+                        |
+                        v
+              scaffolder::write_output(output, dir) (disk, overwrite policy)
 ```
 
-This allows templates to be edited without recompiling the application.
+## Public surface
 
-Future template packs may include:
+```cpp
+// include/scaffolder/Templates.h
+core::fs::Path default_template_directory();
+core::Result<codegen::TemplateSet> load_templates(const core::fs::Path& directory);
 
-- Android Application
-- Android Library
-- Jetpack Compose
-- JNI Project
-- Multi-module Project
-- Kotlin-only Project
-- C++ Native Project
+// include/scaffolder/ProjectWriter.h
+struct WriteReport { std::vector<core::fs::Path> written, skipped; };
+core::Result<WriteReport> write_output(const codegen::GenerationOutput&, const core::fs::Path&);
+```
+
+No classes: the six class skeletons that used to live here
+(`ProjectValidator`, `DirectoryBuilder`, `ResourceGenerator`, `ProjectWriter`,
+`Scaffolder`, `TemplateEngine`) were empty stubs whose responsibilities are now
+either a free function here or in `codegen`.
+
+## Files
+
+| File | Purpose |
+|---|---|
+| `include/scaffolder/Templates.h`, `template/TemplateLoader.cpp` | read the template set, with the configure-time default directory |
+| `include/scaffolder/ProjectWriter.h`, `writer/ProjectWriter.cpp` | write the tree, skip existing user-owned files |
+| `include/scaffolder/Config.h.in` | configured into the build dir: `ASSTUDIO_TEMPLATE_DIR` |

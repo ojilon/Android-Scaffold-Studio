@@ -1,6 +1,14 @@
 add_library(codegen STATIC)
-target_include_directories(codegen PUBLIC include)
+
 target_sources(codegen PRIVATE
-    Scaffolder.cpp
+    Generation.cpp
+    Template.cpp
 )
-target_link_libraries(codegen PRIVATE parser core)
+
+target_include_directories(codegen PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(codegen PUBLIC parser core)
+
+target_apply_warnings(codegen)

@@ -1,77 +1,32 @@
 # Template Engine
 
-## Purpose
+The renderer lives in `codegen` (`include/codegen/Template.h`,
+`codegen/Template.cpp`); the scaffolder only loads template text from disk.
 
-Transforms text templates into finished files.
-
----
-
-## Example
-
-Template
+## Syntax
 
 ```text
-package ${PACKAGE}
+package {{app.package}};
 
-class ${CLASS}
+{{screen.modifiers}} class {{screen.className}} extends AppCompatActivity {
+{{screen.fields}}
 ```
 
-Variables
+- `{{dotted.path}}` reads a value from a `nlohmann::json` object.
+- Whitespace inside the braces is ignored: `{{ app.name }}`.
+- No loops, no conditionals, no includes. Fragments (fields, listeners, state
+  views) are rendered in C++ and passed in as strings.
+- Substituted text is never rescanned, so a value containing `{{` cannot loop.
+- An unknown placeholder or a non-string value is an error naming the template and
+  the placeholder. Silent leftovers would ship broken Java.
+
+## Error format
 
 ```
-PACKAGE
-
-↓
-
-com.example.app
-
-CLASS
-
-↓
-
-MainActivity
+ScreenBase.java.in: unknown template variable {{screen.clazzName}}
 ```
 
-Output
+## Future
 
-```java
-package com.example.app;
-
-class MainActivity
-```
-
----
-
-## Supported
-
-Current
-
-- Variable replacement
-
-Future
-
-- if
-- else
-- loops
-- include
-- nested templates
-
----
-
-## Design Goal
-
-The template engine is intentionally generic.
-
-It should be capable of generating
-
-- XML
-- Java
-- Kotlin
-- C++
-- Gradle
-- Markdown
-- JSON
-- YAML
-- GitHub Actions
-- CMake
-- Any text-based format
+`inja` remains an open decision (docs/DECISIONS.md). It would only be worth it
+once templates need real logic; today every construct is a substitution.

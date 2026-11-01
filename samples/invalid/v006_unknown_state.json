@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "app": { "name": "Hello", "package": "com.oji.hello", "minSdk": 21 },
+  "screens": [{
+    "id": "home",
+    "states": ["loading", "offline"],
+    "layout": { "type": "column", "children": [] }
+  }]
+}

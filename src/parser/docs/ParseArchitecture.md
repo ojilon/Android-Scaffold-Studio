@@ -39,9 +39,10 @@ Application code should include only
 
 ## Components
 
-### WidgetTree
+### AppModel (AppModel.h)
 
-Shared document model.
+The shared document model: `Widget`, `Layout`, `Screen`, `App`, `AppModel`.
+Plain structs, no behaviour. There is no separate `WidgetTree` type any more.
 
 ---
 
@@ -71,15 +72,10 @@ Every parser reports errors using the same structure.
 
 ---
 
-### XmlReader
+### Xml.cpp
 
-Reads Android XML.
-
----
-
-### XmlWriter
-
-Writes Android XML.
+`parse_xml` / `write_xml` free functions (Phase 4 stubs). No reader/writer
+classes: they would carry no state between calls.
 
 ---
 

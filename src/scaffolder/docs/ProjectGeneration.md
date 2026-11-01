@@ -1,86 +1,35 @@
 # Project Generation
 
-## Overview
-
-The scaffolder converts the internal Project model into a complete Android project on disk.
+## Phase 1 (implemented)
 
 ```
-Project Model
-
-↓
-
-Validation
-
-↓
-
-Directory Creation
-
-↓
-
-Template Expansion
-
-↓
-
-Resource Generation
-
-↓
-
-File Writing
-
-↓
-
-Android Project
+parser::AppModel + codegen::TemplateSet
+        |
+        v
+codegen::generate()      -> GenerationOutput { GeneratedFile { relative_path, content, user_owned } }
+        |
+        v
+scaffolder::write_output() -> WriteReport { written, skipped }
+        |
+        v
+<outdir>/AndroidManifest.xml
+<outdir>/res/layout/<screen>.xml
+<outdir>/java/<package path>/<Screen>ScreenBase.java
+<outdir>/java/<package path>/<Screen>Activity.java   (only if missing)
 ```
 
----
+`write_output` creates parent directories through `core::fs::write_text_file`,
+rewrites generated files every time, and skips user-owned files that already
+exist, listing them in `WriteReport::skipped` so the CLI can report
+`kept <path> (user-owned, already exists)`.
 
-## Generation Order
+## Phase 2 (planned)
 
-1. Validate the project.
-2. Create directories.
-3. Load templates.
-4. Expand template variables.
-5. Generate resources.
-6. Write all files.
-7. Verify output.
+Full Gradle project skeleton: `settings.gradle`, `build.gradle`,
+`gradle.properties`, `res/values/{strings,colors,themes}.xml`, `gradlew` wrapper
+copy, plus directories (`src/main/java`, `src/main/res/...`). They will use the
+same write path, and the same generated/user-owned distinction (`gradle.properties`
+becomes user-owned the moment it exists).
 
----
-
-## Resource Generation
-
-The ResourceGenerator is responsible for creating:
-
-- layout/
-- values/
-- drawable/
-- mipmap/
-- menu/
-- navigation/
-- xml/
-
-Each resource type is generated independently.
-
----
-
-## Validation
-
-ProjectValidator performs checks before any files are written.
-
-Typical checks include:
-
-- Missing project name
-- Invalid Java package
-- Unsupported SDK versions
-- Duplicate identifiers
-- Missing templates
-
----
-
-## Future Extensions
-
-- Compose project generation
-- Android library projects
-- Dynamic feature modules
-- Native (JNI) projects
-- Kotlin templates
-- Custom template packs
+Order of work: directories -> Gradle files -> resources -> manifest -> layouts ->
+Java. Each stage fails loudly and leaves nothing half-written for that stage.

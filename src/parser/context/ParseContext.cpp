@@ -1,18 +1,15 @@
 #include <parser/ParseContext.h>
 
-namespace parser
-{
+#include <utility>
 
-void ParseContext::add_error(
-    ParseError error)
-{
-    errors.push_back(
-        std::move(error));
+namespace parser {
+
+void add_error(ParseContext& context, ParseError error) {
+    context.errors.push_back(std::move(error));
 }
 
-bool ParseContext::has_errors() const
-{
-    return !errors.empty();
+bool has_errors(const ParseContext& context) {
+    return !context.errors.empty();
 }
 
-}
+} // namespace parser

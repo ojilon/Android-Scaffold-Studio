@@ -1,10 +1,15 @@
-# Widget Tree
+# Widget Tree (parser::Widget)
 
 ## Purpose
 
-The Widget Tree is the central data model of the application.
+The widget tree is the central data model of the application: a
+`parser::Widget` with nested `children`, defined in
+`include/parser/AppModel.h`.
 
-Everything operates on this structure instead of directly editing XML.
+Everything operates on this structure instead of directly editing XML. There is
+no `WidgetTree` type of its own any more - the model's `Widget` *is* the tree,
+which removes the duplicate definition that used to clash between
+`WidgetTree.h` and `AppModel.h`.
 
 ---
 
@@ -67,9 +72,9 @@ LinearLayout
 
 ---
 
-## Tree Utilities
+## Tree Utilities (`include/parser/TreeUtils.h`)
 
-The helper functions provide
+The free functions provide
 
 visit()
 
@@ -87,6 +92,10 @@ count_widgets()
 
 Returns the total number of widgets.
 
+all_ids()
+
+Every non-empty id, in document order (used by tests and the future UI).
+
 ---
 
 ## Design Rules
@@ -103,6 +112,8 @@ Widget Tree never depends on Java.
 
 Widget Tree never depends on the Designer.
 
-Every subsystem depends on the Widget Tree.
+Every subsystem depends on this model.
 
-It is the shared language of the application.
+It is the shared language of the application. Because it is a plain struct, it is
+cheap to copy, compare and construct in tests; all behaviour lives in free
+functions.

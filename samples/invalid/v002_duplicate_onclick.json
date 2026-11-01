@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "app": { "name": "Hello", "package": "com.oji.hello", "minSdk": 21 },
+  "screens": [{
+    "id": "home",
+    "layout": {
+      "type": "column",
+      "children": [
+        { "type": "button", "id": "save", "text": "Save", "onClick": "retry" },
+        { "type": "button", "id": "cancel", "text": "Cancel", "onClick": "Retry" }
+      ]
+    }
+  }]
+}

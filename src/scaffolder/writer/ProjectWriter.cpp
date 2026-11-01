@@ -1,34 +1,33 @@
 #include <scaffolder/ProjectWriter.h>
 
-namespace scaffolder
-{
+#include <utility>
 
-result::VoidResult
-ProjectWriter::write(
-    const project::Project& project)
-{
-    /*
-    TODO
+namespace scaffolder {
 
-    AndroidManifest.xml
+core::Result<WriteReport> write_output(const codegen::GenerationOutput& output,
+                                       const core::fs::Path& output_directory) {
+    WriteReport report;
 
-    build.gradle
+    for (const codegen::GeneratedFile& file : output.files) {
+        const core::fs::Path target = output_directory / file.relative_path;
 
-    settings.gradle
+        if (file.user_owned) {
+            auto exists = core::fs::exists(target);
+            if (!exists)
+                return std::unexpected(exists.error());
+            if (*exists) {
+                report.skipped.push_back(file.relative_path);
+                continue;
+            }
+        }
 
-    gradle.properties
+        if (auto written = core::fs::write_text_file(target, file.content); !written)
+            return std::unexpected(written.error());
 
-    strings.xml
+        report.written.push_back(file.relative_path);
+    }
 
-    colors.xml
-
-    themes.xml
-
-    */
-
-    (void)project;
-
-    return {};
+    return report;
 }
 
-}
+} // namespace scaffolder

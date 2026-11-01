@@ -1,53 +1,70 @@
 #include <core/Logger.h>
 
-#include <chrono>
-#include <format>
+#include <ctime>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 namespace {
 
-logger::Level current_level = logger::Level::Info;
+core::logger::Level g_level = core::logger::Level::Info;
 
-const char* level_string(logger::Level level) {
+const char* level_name(core::logger::Level level) {
     switch (level) {
-        case logger::Level::Debug:   return "DEBUG";
-        case logger::Level::Info:    return "INFO";
-        case logger::Level::Warning: return "WARNING";
-        case logger::Level::Error:   return "ERROR";
+        case core::logger::Level::Debug:   return "DEBUG";
+        case core::logger::Level::Info:    return "INFO";
+        case core::logger::Level::Warning: return "WARNING";
+        case core::logger::Level::Error:   return "ERROR";
     }
     return "UNKNOWN";
 }
 
-bool should_print(logger::Level level) {
-    return static_cast<int>(level) >= static_cast<int>(current_level);
+bool should_print(core::logger::Level level) {
+    return static_cast<int>(level) >= static_cast<int>(g_level);
 }
 
-void print(logger::Level level, std::string_view message) {
+// Local wall-clock time as "YYYY-MM-DD HH:MM:SS".
+// std::strftime + std::localtime keeps this portable; <format> is not used
+// anywhere in the codebase because GCC 12 and older MSVC lack it.
+std::string timestamp() {
+    const std::time_t now = std::time(nullptr);
+
+    std::tm parts{};
+#if defined(_WIN32)
+    localtime_s(&parts, &now);
+#else
+    localtime_r(&now, &parts);
+#endif
+
+    char buffer[32] = {};
+    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &parts);
+    return buffer;
+}
+
+void print(core::logger::Level level, std::string_view message) {
     if (!should_print(level))
         return;
 
-    auto now = std::chrono::system_clock::now();
-    auto t   = std::chrono::system_clock::to_time_t(now);
-
-    // simple timestamp – avoids format issues with time_point on some compilers
-    char buf[64];
-    std::strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", std::localtime(&t));
-
-    std::cout << std::format("[{}] {} : {}\n", level_string(level), buf, message);
+    std::ostringstream line;
+    line << '[' << timestamp() << "] " << level_name(level) << ": " << message << '\n';
+    std::cout << line.str() << std::flush;
 }
 
-} // anonymous namespace
+} // namespace
 
-namespace logger {
+namespace core::logger {
 
 void set_level(Level level) {
-    current_level = level;
+    g_level = level;
 }
 
-void debug(std::string_view message)   { print(Level::Debug,   message); }
-void info(std::string_view message)    { print(Level::Info,    message); }
-void warning(std::string_view message) { print(Level::Warning, message); }
-void error(std::string_view message)   { print(Level::Error,   message); }
+Level level() {
+    return g_level;
+}
 
-} // namespace logger
+void debug(std::string_view message)   { print(Level::Debug, message); }
+void info(std::string_view message)    { print(Level::Info, message); }
+void warning(std::string_view message) { print(Level::Warning, message); }
+void error(std::string_view message)   { print(Level::Error, message); }
+
+} // namespace core::logger

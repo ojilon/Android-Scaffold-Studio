@@ -1,20 +1,42 @@
 #pragma once
 
+/*
+============================================================
+
+Module:
+    core
+
+File:
+    Settings.h
+
+Purpose:
+    User settings (SDK/NDK locations, last project folder,
+    theme). Values only; behaviour lives in free functions.
+
+Status:
+    Phase 1 stores nothing. save()/load() report "not
+    implemented yet" so the CLI can degrade instead of
+    crashing once a settings file is introduced.
+
+============================================================
+*/
+
 #include <core/FileSystem.h>
 #include <core/Result.h>
 
-namespace settings {
+namespace core::settings {
 
 struct Settings {
-    filesystem::Path sdk_directory;
-    filesystem::Path ndk_directory;
-    filesystem::Path projects_directory;
+    fs::Path sdk_directory;
+    fs::Path ndk_directory;
+    fs::Path projects_directory;
     bool dark_theme = true;
 };
 
 Settings defaults();
 
-core::VoidResult save(const Settings& s, const filesystem::Path& path);
-core::Result<Settings> load(const filesystem::Path& path);
+VoidResult save(const Settings& settings, const fs::Path& path);
 
-} // namespace settings
+Result<Settings> load(const fs::Path& path);
+
+} // namespace core::settings

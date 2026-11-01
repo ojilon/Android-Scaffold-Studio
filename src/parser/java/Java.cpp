@@ -2,102 +2,32 @@
 ============================================================
 
 Module:
-    Parser
+    parser
 
 File:
     Java.cpp
 
 Purpose:
-    Java source parser.
+    Java source reader.
 
-Responsibilities
+Status:
+    Phase 1 stub. The importer pipeline will be:
 
-    Java Source
+        Java source -> tokenizer -> AST -> internal model
 
-        ↓
-
-    Tokenizer
-
-        ↓
-
-    AST
-
-        ↓
-
-    Internal Representation
+    tree-sitter-java is a Phase 4 dependency; nothing is
+    vendored for it yet on purpose.
 
 ============================================================
 */
 
 #include <parser/Java.h>
 
-namespace parser
-{
+namespace parser {
 
-result::VoidResult
-parse_java(
-    const filesystem::Path& file)
-{
-    /*
-    --------------------------------------------------------
-
-    Future pipeline
-
-    Read File
-
-        ↓
-
-    Tokenize
-
-        ↓
-
-    Parse Classes
-
-        ↓
-
-    Parse Methods
-
-        ↓
-
-    Parse Fields
-
-        ↓
-
-    Parse Imports
-
-        ↓
-
-    Build AST
-
-    --------------------------------------------------------
-    */
-
-    (void)file;
-
-    return std::unexpected(
-        "Java parser not implemented.");
+core::VoidResult parse_java(const core::fs::Path& file) {
+    return std::unexpected("Java parsing is not implemented yet (Phase 4 importer): " +
+                           file.string());
 }
 
-}
-
-/*
-============================================================
-
-TODO
-
-[ ] Java tokenizer
-[ ] AST
-[ ] Imports
-[ ] Packages
-[ ] Classes
-[ ] Interfaces
-[ ] Enums
-[ ] Fields
-[ ] Constructors
-[ ] Methods
-[ ] Lambdas
-[ ] Generics
-[ ] Annotations
-
-============================================================
-*/
+} // namespace parser

@@ -1,29 +1,18 @@
 ## Internal Architecture
 
-The XML parser is divided into four layers.
+The XML folder holds three things:
 
 ```
-Xml.cpp
+Xml.cpp            public API: parse_xml / write_xml (Phase 4 stubs)
+XmlAttribute.h     the Attribute value type
+XmlAttribute.cpp   attribute helpers: is_android_attribute, is_tools_attribute,
+                   is_app_attribute
 ```
 
-Public API only.
+There is no `XmlReader` / `XmlWriter` class pair: reading and writing XML carry no
+state between calls, so they are free functions returning `core::Result`, and the
+pugixml document owns its own memory.
 
-```
-XmlReader
-```
-
-Responsible for converting XML into the Widget Tree.
-
-```
-XmlWriter
-```
-
-Responsible for converting the Widget Tree back into XML.
-
-```
-XmlAttribute
-```
-
-Contains reusable attribute helper functions (namespace checks, classification, future validation).
-
-This separation keeps each file focused on one responsibility and avoids one large implementation file.
+The importer (Phase 4) will keep the same two entry points; only their bodies
+change. pugixml is vendored in `third_party/pugixml` and is not compiled until
+then.

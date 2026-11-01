@@ -1,33 +1,20 @@
-# Scaffolder
+# Scaffolder Module
 
-## Purpose
+Two jobs, both structs + free functions:
 
-Creates complete Android project structures from the internal
-Project model.
+1. **Template loading** - `include/scaffolder/Templates.h`:
+   `default_template_directory()` and `load_templates(dir)` read
+   `templates/xml/*.in`, `templates/java/*.in` and
+   `templates/android/AndroidManifest.xml.in` into a
+   `codegen::TemplateSet`. The default directory is recorded by CMake
+   (`scaffolder/Config.h`); `--templates` overrides it.
+2. **Writing the output tree** - `include/scaffolder/ProjectWriter.h`:
+   `write_output(output, dir)` writes every `codegen::GeneratedFile`, creating
+   directories as needed, and returns a `WriteReport` of what was `written` and
+   what was `skipped` because it is user-owned and already exists.
 
-The scaffolder owns every generated file on disk.
+The scaffolder never decides what a file contains (that is `codegen`), and
+`codegen` never touches the disk (that is this module).
 
----
-
-## Responsibilities
-
-- Create folders
-- Generate Gradle files
-- Generate AndroidManifest.xml
-- Generate resources
-- Expand templates
-- Write files
-
----
-
-## Non Responsibilities
-
-The scaffolder never
-
-- parses XML
-- edits layouts
-- renders widgets
-- generates Java logic
-- generates JNI
-
-Those belong to later modules.
+Phase 2 will add the full Gradle project skeleton here (directories, Gradle
+files, `res/values`, themes) using the same write path.
