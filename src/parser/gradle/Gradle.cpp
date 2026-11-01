@@ -2,99 +2,29 @@
 ============================================================
 
 Module:
-    Parser
+    parser
 
 File:
     Gradle.cpp
 
 Purpose:
-    Gradle parser.
+    Gradle file reader.
 
-Responsibilities
-
-    build.gradle
-
-        ↓
-
-    Tokenizer
-
-        ↓
-
-    AST
-
-        ↓
-
-    Internal Project Model
+Status:
+    Phase 1 stub. Phase 2 generates the Gradle skeleton from
+    templates, so reading Gradle only becomes interesting with
+    the round-trip importer.
 
 ============================================================
 */
 
 #include <parser/Gradle.h>
 
-namespace parser
-{
+namespace parser {
 
-result::VoidResult
-parse_gradle(
-    const filesystem::Path& file)
-{
-    /*
-    --------------------------------------------------------
-
-    Future pipeline
-
-    Read File
-
-        ↓
-
-    Tokenize
-
-        ↓
-
-    Parse Blocks
-
-        ↓
-
-    Parse Plugins
-
-        ↓
-
-    Parse Dependencies
-
-        ↓
-
-    Parse Android Block
-
-        ↓
-
-    Internal Model
-
-    --------------------------------------------------------
-    */
-
-    (void)file;
-
-    return std::unexpected(
-        "Gradle parser not implemented.");
+core::VoidResult parse_gradle(const core::fs::Path& file) {
+    return std::unexpected("Gradle parsing is not implemented yet (Phase 4 importer): " +
+                           file.string());
 }
 
-}
-
-/*
-============================================================
-
-TODO
-
-[ ] plugins{}
-[ ] android{}
-[ ] dependencies{}
-[ ] repositories{}
-[ ] signingConfigs{}
-[ ] buildTypes{}
-[ ] flavors{}
-[ ] kotlin support
-[ ] version catalog
-[ ] settings.gradle
-
-============================================================
-*/
+} // namespace parser

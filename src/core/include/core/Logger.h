@@ -4,28 +4,32 @@
 ============================================================
 
 Module:
-    Core
+    core
 
 File:
     Logger.h
 
 Purpose:
-    Lightweight logging interface.
+    Tiny line logger for the CLI and the future UI log pane.
 
-Dependencies:
-    Standard Library
+Why free functions:
+    A logger is a process-wide sink. Hiding it in a singleton
+    class buys nothing; a namespace and one level flag are
+    simpler and keep call sites short.
 
-Used By:
-    Entire application
+Note:
+    The level is global mutable state. That is acceptable for
+    a single-threaded tool; if the UI thread arrives later it
+    owns the sink and this header becomes the seam.
 
 ============================================================
 */
 
 #include <string_view>
 
-namespace logger{
+namespace core::logger {
 
-enum class Level{
+enum class Level {
     Debug,
     Info,
     Warning,
@@ -33,13 +37,11 @@ enum class Level{
 };
 
 void set_level(Level level);
+Level level();
 
 void debug(std::string_view message);
-
 void info(std::string_view message);
-
 void warning(std::string_view message);
-
 void error(std::string_view message);
 
-}
+} // namespace core::logger

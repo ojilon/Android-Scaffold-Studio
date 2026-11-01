@@ -4,60 +4,46 @@
 ============================================================
 
 Module:
-    Parser
+    parser
 
 File:
     TreeUtils.h
 
 Purpose:
-    Common WidgetTree operations.
+    Read-only helpers for walking parser::Widget trees.
+
+Why:
+    The validator, the generator and the tests all need the
+    same traversal. Keeping it in one place (free functions
+    over the value type) means the model stays behaviour-free
+    and no two call sites can disagree about ordering.
 
 ============================================================
 */
 
-#include <parser/WidgetTree.h>
+#include <parser/AppModel.h>
 
+#include <cstddef>
 #include <functional>
+#include <string_view>
 #include <vector>
 
-namespace parser
-{
+namespace parser {
 
-using WidgetVisitor =
-    std::function<void(Widget&)>;
+using WidgetVisitor = std::function<void(Widget&)>;
+using ConstWidgetVisitor = std::function<void(const Widget&)>;
 
-using ConstWidgetVisitor =
-    std::function<void(const Widget&)>;
+void visit(Widget& root, const WidgetVisitor& visitor);
+void visit(const Widget& root, const ConstWidgetVisitor& visitor);
 
-void visit(
-    Widget& root,
-    WidgetVisitor visitor
-);
+Widget* find_by_id(Widget& root, std::string_view id);
+const Widget* find_by_id(const Widget& root, std::string_view id);
 
-void visit(
-    const Widget& root,
-    ConstWidgetVisitor visitor
-);
+std::vector<Widget*> find_by_type(Widget& root, std::string_view type);
 
-Widget* find_by_id(
-    Widget& root,
-    const std::string& id
-);
+std::size_t count_widgets(const Widget& root);
 
-const Widget* find_by_id(
-    const Widget& root,
-    const std::string& id
-);
+// Every non-empty id in the tree, in document order.
+std::vector<std::string> all_ids(const Widget& root);
 
-std::vector<Widget*>
-find_by_type(
-    Widget& root,
-    const std::string& type
-);
-
-std::size_t
-count_widgets(
-    const Widget& root
-);
-
-}
+} // namespace parser

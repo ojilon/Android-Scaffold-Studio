@@ -40,11 +40,8 @@ XML Writer
 ## Public API
 
 ```cpp
-result::Result<Layout>
-parse_xml(...);
-
-result::VoidResult
-write_xml(...);
+core::Result<Layout> parse_xml(const core::fs::Path& xml_file);
+core::VoidResult      write_xml(const Layout& layout, const core::fs::Path& output_file);
 ```
 
 The parser owns XML parsing.
@@ -52,6 +49,13 @@ The parser owns XML parsing.
 No other module should call pugixml directly.
 
 ---
+
+## Status
+
+Phase 1 does not read XML: both functions return a `core::Result` error. The
+generator writes XML itself, and the importer (Phase 4) needs a shape that
+preserves attributes it does not understand, which is a different design from
+the generator's model.
 
 ## Widget Tree
 

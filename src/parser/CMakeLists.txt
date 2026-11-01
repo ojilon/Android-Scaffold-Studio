@@ -1,41 +1,22 @@
-# ============================================================
-#
-# Module:
-#     Parser
-#
-# Purpose:
-#     Converts Android project files into the application's
-#     internal data model.
-#
-# Provides:
-#     - XML parser
-#     - Java parser
-#     - Gradle parser
-#
-# ============================================================
-
 add_library(parser STATIC)
 
-target_sources(parser
-PRIVATE
-
-    xml/Xml.cpp
-    java/Java.cpp
-    gradle/Gradle.cpp
-    tree/TreeUtils.cpp
+target_sources(parser PRIVATE
+    AppModelLoader.cpp
     context/ParseContext.cpp
     error/ParseError.cpp
+    gradle/Gradle.cpp
+    java/Java.cpp
+    tree/TreeUtils.cpp
+    xml/Xml.cpp
+    xml/XmlAttribute.cpp
 )
 
-target_include_directories(parser
-PUBLIC
+target_include_directories(parser PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_link_libraries(parser
-PUBLIC
-    core
-)
+# PUBLIC: parser's headers expose core::Result / core::fs::Path, so anything
+# that links parser needs core's include directory too.
+target_link_libraries(parser PUBLIC core)
 
-target_apply_compiler_options(parser)
 target_apply_warnings(parser)

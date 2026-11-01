@@ -6,14 +6,19 @@ function(target_apply_warnings TARGET_NAME)
             ${TARGET_NAME}
             PRIVATE
             /W4
+            /permissive-
+            /utf-8
         )
+
+        if(ASSTUDIO_WERROR)
+            target_compile_options(${TARGET_NAME} PRIVATE /WX)
+        endif()
 
     else()
 
         target_compile_options(
             ${TARGET_NAME}
             PRIVATE
-
             -Wall
             -Wextra
             -Wpedantic
@@ -22,8 +27,11 @@ function(target_apply_warnings TARGET_NAME)
             -Wnon-virtual-dtor
             -Wold-style-cast
             -Woverloaded-virtual
-            #can add -Werror later
         )
+
+        if(ASSTUDIO_WERROR)
+            target_compile_options(${TARGET_NAME} PRIVATE -Werror)
+        endif()
 
     endif()
 

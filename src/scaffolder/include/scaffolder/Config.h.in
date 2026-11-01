@@ -1,0 +1,7 @@
+#pragma once
+
+// Configured by CMake (see src/scaffolder/CMakeLists.txt).
+// Do not edit the generated copy in the build directory.
+
+// Absolute path of the repository's templates/ folder at configure time.
+#define ASSTUDIO_TEMPLATE_DIR "@ASSTUDIO_TEMPLATE_DIR@"

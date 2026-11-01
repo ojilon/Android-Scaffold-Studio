@@ -4,57 +4,29 @@
 ============================================================
 
 Module:
-    Parser
+    parser
 
 File:
     ParseError.h
 
 Purpose:
-    Common parser error representation.
+    One problem found while reading a file. The same struct is
+    used for model loading errors and (later) XML/Java import
+    diagnostics, so the CLI has exactly one error format:
+
+        [CODE] $.screens[0].id: message
 
 ============================================================
 */
 
 #include <string>
 
-namespace parser
-{
+namespace parser {
 
-enum class ParseErrorCode
-{
-    None,
-
-    FileNotFound,
-
-    CannotOpen,
-
-    InvalidFormat,
-
-    InvalidSyntax,
-
-    MissingRoot,
-
-    InvalidAttribute,
-
-    DuplicateId,
-
-    UnsupportedVersion,
-
-    Unknown
+struct ParseError {
+    std::string id;      // stable, greppable code, e.g. "JSON_PARSE_ERROR"
+    std::string path;    // JSON path, e.g. "$.screens[0].layout.type"
+    std::string message; // human readable detail
 };
 
-struct ParseError
-{
-    ParseErrorCode code =
-        ParseErrorCode::None;
-
-    std::string message;
-
-    std::string file;
-
-    std::size_t line = 0;
-
-    std::size_t column = 0;
-};
-
-}
+} // namespace parser
