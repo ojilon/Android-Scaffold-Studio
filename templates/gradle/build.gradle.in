@@ -1,2 +1,4 @@
-# Phase 2 placeholder: full Gradle skeleton generation.
-# Generated files will be rendered from this template; see docs/08-roadmap.md.
+// Root build.gradle – asstudio generated skeleton
+plugins {
+    id 'com.android.application' version '8.2.2' apply false
+}
