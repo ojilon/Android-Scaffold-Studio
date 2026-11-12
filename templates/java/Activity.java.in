@@ -1,7 +1,7 @@
-package {{app.package}};
+package {{package}};
 
 // User-owned file: asstudio never overwrites it once it exists.
 // Handler bodies are yours; the base class is regenerated around them.
-public class {{screen.activityClass}} extends {{screen.baseClass}} {
-{{screen.handlers}}
+public class {{screen_class}}Activity extends {{screen_class}}ScreenBase {
+{{handler_stubs}}
 }

@@ -1,17 +1,27 @@
 // asstudio:generated v1 DO NOT EDIT
-package {{app.package}};
+package {{package}};
 
-{{java.imports}}
+import android.os.Bundle;
+import android.view.View;
+{{imports}}
+import androidx.appcompat.app.AppCompatActivity;
 
-{{screen.modifiers}} class {{screen.className}} extends AppCompatActivity {
-{{screen.fields}}
+public abstract class {{screen_class}}ScreenBase extends AppCompatActivity {
+{{fields}}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.{{screen.layoutName}});
-{{screen.findViews}}
-{{screen.listeners}}
-{{screen.initialState}}    }
-{{screen.handlers}}
-{{screen.setState}}}
+        setContentView(R.layout.{{screen_id}});
+
+{{find_views}}
+{{click_listeners}}
+        setState("{{first_state}}");
+    }
+
+{{abstract_handlers}}
+
+    public void setState(String state) {
+{{set_state_body}}
+    }
+}

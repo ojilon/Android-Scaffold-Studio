@@ -1,0 +1,42 @@
+// asstudio:generated v1 DO NOT EDIT
+// Minimal Odin native engine skeleton (WayDirect-style).
+// Owns the action router and domain logic.
+// JNI layer lives in a sibling file and only converts types + calls here.
+
+package {{package_odin}}
+
+import "core:c"
+import "core:fmt"
+import "core:os"
+import "core:strings"
+
+// Action IDs - keep in sync with the Java Bridge constants.
+ACTION_PING          :: 1
+ACTION_LIST_DIR      :: 2
+ACTION_READ_FILE     :: 3
+// ... add more as the app grows
+
+// Private app home is set once from Java (Context.getFilesDir()).
+@(private)
+g_app_home: string
+
+set_app_home :: proc(path: string) {
+    if g_app_home != "" do delete(g_app_home)
+    g_app_home = strings.clone(path)
+}
+
+// Router: Java calls one entry point with (action_id, request_json, out_path).
+// All heavy work and all large results stay on the native side / filesystem.
+
+handle_action :: proc(action: c.int, request_json: string, out_path: string) -> c.int {
+    switch action {
+    case ACTION_PING:
+        return write_result_ok(out_path, "")
+    case ACTION_LIST_DIR:
+        // TODO: implement with bionic-safe dir walk
+        return write_result_err(out_path, STATUS_ERR_INTERNAL, "list_dir not implemented")
+    case ACTION_READ_FILE:
+        return write_result_err(out_path, STATUS_ERR_INTERNAL, "read_file not implemented")
+    }
+    return write_result_err(out_path, STATUS_ERR_ARGS, fmt.tprintf("unknown action %d", action))
+}

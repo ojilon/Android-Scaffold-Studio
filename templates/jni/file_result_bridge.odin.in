@@ -1,0 +1,53 @@
+// asstudio:generated v1 DO NOT EDIT
+// File-backed JNI result pattern (captured from WayDirect).
+// Java passes a small request + an output path; native does the work,
+// writes a JSON (or binary) file under the app cache, and returns
+// {status, path}. Large payloads never cross the JNI boundary.
+
+package {{package_odin}}
+
+import "core:c"
+import "core:fmt"
+import "core:os"
+import "core:strings"
+
+// Status codes returned to Java
+STATUS_OK            :: 0
+STATUS_ERR_IO        :: 1
+STATUS_ERR_ARGS      :: 2
+STATUS_ERR_INTERNAL  :: 3
+
+// Result is always written as a tiny JSON file:
+//   {"status":0,"path":"/data/user/0/.../cache/result_xxx.json"}
+// or for pure status:
+//   {"status":1,"message":"..."}
+
+write_result_ok :: proc(out_path: string, payload_path: string) -> c.int {
+    content := fmt.tprintf(`{"status":0,"path":"%s"}`, payload_path)
+    if !os.write_entire_file(out_path, transmute([]byte)content) {
+        return STATUS_ERR_IO
+    }
+    return STATUS_OK
+}
+
+write_result_err :: proc(out_path: string, status: c.int, message: string) -> c.int {
+    content := fmt.tprintf(`{"status":%d,"message":"%s"}`, status, message)
+    if !os.write_entire_file(out_path, transmute([]byte)content) {
+        return STATUS_ERR_IO
+    }
+    return status
+}
+
+// Example action entry point - replace with real domain logic.
+// Java side:  native int doAction(String requestJson, String outPath);
+// Odin side:  the JNI glue calls this after converting jstring -> string.
+
+do_action :: proc(request_json: string, out_path: string, app_home: string) -> c.int {
+    // 1. Parse request_json (keep it small).
+    // 2. Do the real work under app_home / cache.
+    // 3. Write any large result to a file under the cache.
+    // 4. Call write_result_ok / write_result_err.
+    _ = request_json
+    _ = app_home
+    return write_result_err(out_path, STATUS_ERR_INTERNAL, "not implemented")
+}
