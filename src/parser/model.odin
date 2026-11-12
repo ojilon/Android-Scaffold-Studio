@@ -31,7 +31,7 @@ Screen :: struct {
 
 App :: struct {
     name:    string,
-    package: string,
+    pckg: string,
     min_sdk: int,
 }
 

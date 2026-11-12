@@ -11,8 +11,8 @@ LoadError :: struct {
 }
 
 load_from_file :: proc(path: string) -> (AppModel, LoadError, bool) {
-    data, ok := os.read_entire_file(path)
-    if !ok {
+    data, ok := os.read_entire_file(path, context.allocator)
+    if ok != nil {
         return {}, LoadError{path = path, message = "could not read file"}, false
     }
     defer delete(data)
@@ -71,7 +71,7 @@ load_app :: proc(obj: json.Object) -> App {
         if s, ok := v.(json.String); ok do a.name = strings.clone(s)
     }
     if v, ok := obj["package"]; ok {
-        if s, ok := v.(json.String); ok do a.package = strings.clone(s)
+        if s, ok := v.(json.String); ok do a.pckg = strings.clone(s)
     }
     if v, ok := obj["minSdk"]; ok {
         if n, ok := v.(json.Integer); ok do a.min_sdk = int(n)

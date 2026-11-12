@@ -48,8 +48,8 @@ render :: proc(template: string, values: map[string]string) -> (string, RenderEr
 }
 
 load_template :: proc(path: string) -> (string, bool) {
-    data, ok := os.read_entire_file(path)
-    if !ok do return "", false
+    data, ok := os.read_entire_file(path, context.allocator)
+    if ok != nil  do return "", false
     // caller owns the returned string
     return string(data), true
 }
