@@ -37,10 +37,10 @@ validate :: proc(model: parser.AppModel) -> [dynamic]RuleViolation {
             id = "V004", path = "$.app.name", message = "app name must be non-empty",
         })
     }
-    if !is_valid_package(model.app.package) {
+    if !is_valid_package(model.app.pckg) {
         append(&violations, RuleViolation{
             id = "V004", path = "$.app.package",
-            message = fmt.tprintf("invalid Java package name \"%s\"", model.app.package),
+            message = fmt.tprintf("invalid Java package name \"%s\"", model.app.pckg),
         })
     }
 
