@@ -1,6 +1,6 @@
 package codegen
 
-import "../parser"
+import "src:parser"
 import "core:fmt"
 import "core:strings"
 import "core:unicode"
@@ -204,7 +204,7 @@ generate_screen_base :: proc(model: parser.AppModel, s: parser.Screen, class_nam
     strings.write_string(&b, "\n")
     for w in s.layout.children {
         if w.on_click != "" && w.id != "" {
-            method := strings.concatenate({"on", w.on_click})
+            method := strings.concatenate({"on", capitalize(w.on_click)})
             
             strings.write_string(&b, fmt.tprintf("        %s.setOnClickListener(v -> %s());\n", w.id, method))
         }
@@ -221,7 +221,7 @@ generate_screen_base :: proc(model: parser.AppModel, s: parser.Screen, class_nam
     strings.write_string(&b, "    }\n\n")
     for w in s.layout.children {
         if w.on_click != "" {
-            method := strings.concatenate({"on", w.on_click})
+            method := strings.concatenate({"on", capitalize(w.on_click)})
             //method := "on" + capitalize(w.on_click)
             strings.write_string(&b, fmt.tprintf("    protected abstract void %s();\n\n", method))
         }
@@ -252,7 +252,7 @@ generate_activity :: proc(model: parser.AppModel, s: parser.Screen, class_name: 
     
     for w in s.layout.children {
         if w.on_click != "" {
-            method := strings.concatenate({"on", w.on_click})
+            method := strings.concatenate({"on", capitalize(w.on_click)})
             //method := "on" + capitalize(w.on_click)
             strings.write_string(&b, fmt.tprintf("    @Override\n    protected void %s() {\n        // TODO: implement %s()\n    }\n", method, method))
         }
