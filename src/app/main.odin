@@ -133,7 +133,9 @@ do_generate :: proc(model_path, out_dir: string) {
     written := 0
     skipped := 0
     for f in files {
-        full := filepath.join({out_dir, f.path})
+
+        //an allocator error returned is ingored here, handle it later 
+        full, _ := filepath.join({out_dir, f.path})
         defer delete(full)
 
         dir := filepath.dir(full)
@@ -148,7 +150,7 @@ do_generate :: proc(model_path, out_dir: string) {
             continue
         }
 
-        if !os.write_entire_file(full, transmute([]byte)f.content) {
+        if os.write_entire_file(full, transmute([]byte)f.content) != nil {
             fmt.eprintf("failed to write %s\n", full)
             os.exit(1)
         }
