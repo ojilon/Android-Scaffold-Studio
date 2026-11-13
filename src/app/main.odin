@@ -71,6 +71,8 @@ print_help :: proc() {
     fmt.println("rules (V001...); generate emits XML + Java (+ optional Odin/JNI).")
 }
 
+
+//check whether the rules are followed, flags any violations
 do_validate :: proc(path: string) -> int {
     model, err, ok := parser.load_from_file(path)
     if !ok {
@@ -102,6 +104,7 @@ do_generate :: proc(model_path, out_dir: string) {
     }
     defer parser.destroy_model(&model)
 
+    //check for any violations of the known rules
     violations := validator.validate(model)
     defer delete(violations)
     if len(violations) > 0 {
