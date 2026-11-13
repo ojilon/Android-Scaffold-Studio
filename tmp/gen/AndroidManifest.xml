@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- asstudio:generated v1 DO NOT EDIT -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="%s">
+
+ com.oji.hello    <application>
+        <activity
+            android:name=".HomeActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
