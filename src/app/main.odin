@@ -29,7 +29,8 @@ main :: proc() {
             fmt.eprintln("usage: asstudio validate <model.json>")
             os.exit(1)
         }
-        do_validate(args[2])
+        os.exit(do_validate(args[2]))
+        
     case "generate":
         model_path, out_dir := "", ""
         i := 2
@@ -70,11 +71,11 @@ print_help :: proc() {
     fmt.println("rules (V001...); generate emits XML + Java (+ optional Odin/JNI).")
 }
 
-do_validate :: proc(path: string) {
+do_validate :: proc(path: string) -> int {
     model, err, ok := parser.load_from_file(path)
     if !ok {
         fmt.eprintf("parse error at %s: %s\n", err.path, err.message)
-        os.exit(1)
+        return 1 //no defers triggered
     }
     defer parser.destroy_model(&model)
 
@@ -83,13 +84,14 @@ do_validate :: proc(path: string) {
 
     if len(violations) == 0 {
         fmt.printf("valid (%d screen(s))\n", len(model.screens))
-        os.exit(0)
+        return 0 //trigger both defers
     }
 
     for v in violations {
         fmt.eprintf("[%s] %s: %s\n", v.id, v.path, v.message)
     }
-    os.exit(1)
+
+    return 1 //triggers both defers
 }
 
 do_generate :: proc(model_path, out_dir: string) {
