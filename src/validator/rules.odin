@@ -63,18 +63,18 @@ validate :: proc(model: parser.AppModel) -> [dynamic]RuleViolation {
         // V005 - screen id unique + valid
         if s.id == "" {
             append(&violations, RuleViolation{
-                id = "V005", path = path_prefix + ".id", message = "screen id must be non-empty",
+                id = "V005", path = strings.concatenate({path_prefix, ".id"}), message = "screen id must be non-empty",
             })
         } else {
             if !is_valid_resource_id(s.id) {
                 append(&violations, RuleViolation{
-                    id = "V005", path = path_prefix + ".id",
+                    id = "V005", path = strings.concatenate({path_prefix, ".id"}),
                     message = fmt.tprintf("screen id \"%s\" is not a valid resource / class name", s.id),
                 })
             }
             if seen_screen_ids[s.id] {
                 append(&violations, RuleViolation{
-                    id = "V005", path = path_prefix + ".id",
+                    id = "V005", path = strings.concatenate({path_prefix, ".id"}),
                     message = fmt.tprintf("duplicate screen id \"%s\"", s.id),
                 })
             }
@@ -85,7 +85,7 @@ validate :: proc(model: parser.AppModel) -> [dynamic]RuleViolation {
         if s.states_declared {
             if len(s.states) == 0 {
                 append(&violations, RuleViolation{
-                    id = "V006", path = path_prefix + ".states",
+                    id = "V006", path = strings.concatenate({path_prefix, ".states"}),
                     message = "states declared but empty",
                 })
             }
@@ -94,21 +94,21 @@ validate :: proc(model: parser.AppModel) -> [dynamic]RuleViolation {
                 if st == "content" do has_content = true
                 if !is_known_state(st) {
                     append(&violations, RuleViolation{
-                        id = "V006", path = path_prefix + ".states",
+                        id = "V006", path = strings.concatenate({path_prefix, ".states"}),
                         message = fmt.tprintf("unknown state \"%s\"", st),
                     })
                 }
             }
             if !has_content && len(s.states) > 0 {
                 append(&violations, RuleViolation{
-                    id = "V006", path = path_prefix + ".states",
+                    id = "V006", path = strings.concatenate({path_prefix, ".states"}),
                     message = "states must include \"content\"",
                 })
             }
         }
 
         // Walk widgets for V001, V002, V003, V008, V009
-        walk_widgets(&violations, s.layout.children[:], path_prefix + ".layout", s.id)
+        walk_widgets(&violations, s.layout.children[:], strings.concatenate({path_prefix, ".layout"}), s.id)
     }
 
     return violations
@@ -128,7 +128,7 @@ walk_widgets :: proc(violations: ^[dynamic]RuleViolation, widgets: []parser.Widg
         // V003 - type
         if !is_allowed_type(w.type) {
             append(violations, RuleViolation{
-                id = "V003", path = wpath + ".type",
+                id = "V003", path = strings.concatenate({wpath, ".type"}),
                 message = fmt.tprintf("unknown widget type \"%s\"", w.type),
             })
         }
@@ -137,26 +137,26 @@ walk_widgets :: proc(violations: ^[dynamic]RuleViolation, widgets: []parser.Widg
         if w.id != "" {
             if !is_valid_resource_id(w.id) {
                 append(violations, RuleViolation{
-                    id = "V008", path = wpath + ".id",
+                    id = "V008", path = strings.concatenate({wpath, ".id"}),
                     message = fmt.tprintf("id \"%s\" is not a valid Android resource name", w.id),
                 })
             }
             if is_java_keyword(w.id) {
                 append(violations, RuleViolation{
-                    id = "V009", path = wpath + ".id",
+                    id = "V009", path = strings.concatenate({wpath,  ".id"}),
                     message = fmt.tprintf("id \"%s\" is a Java keyword and cannot become a field", w.id),
                 })
             }
             // Reserve state ids
-            if strings.has_prefix(w.id, screen_id + "_state_") {
+            if strings.has_prefix(w.id, strings.concatenate({screen_id,  "_state_"}) ) {
                 append(violations, RuleViolation{
-                    id = "V001", path = wpath + ".id",
+                    id = "V001", path = strings.concatenate({wpath, ".id"}),
                     message = fmt.tprintf("id \"%s\" is reserved for generated state views", w.id),
                 })
             }
             if seen_ids[w.id] {
                 append(violations, RuleViolation{
-                    id = "V001", path = wpath + ".id",
+                    id = "V001", path = strings.concatenate({wpath, ".id"}),
                     message = fmt.tprintf("duplicate id \"%s\"", w.id),
                 })
             }
@@ -167,13 +167,13 @@ walk_widgets :: proc(violations: ^[dynamic]RuleViolation, widgets: []parser.Widg
         if w.on_click != "" {
             if !is_valid_java_identifier(w.on_click) {
                 append(violations, RuleViolation{
-                    id = "V002", path = wpath + ".onClick",
+                    id = "V002", path = strings.concatenate({wpath, ".onClick"}),
                     message = fmt.tprintf("onClick \"%s\" is not a valid Java identifier", w.on_click),
                 })
             }
             if seen_clicks[w.on_click] {
                 append(violations, RuleViolation{
-                    id = "V002", path = wpath + ".onClick",
+                    id = "V002", path = strings.concatenate({wpath, ".onClick"}),
                     message = fmt.tprintf("duplicate onClick handler \"%s\"", w.on_click),
                 })
             }
