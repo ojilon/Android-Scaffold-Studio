@@ -2,7 +2,6 @@ package codegen
 
 import "src:parser"
 import "core:fmt"
-import "core:strconv"
 import "core:strings"
 
 // Emits a minimal Gradle Android app shell under gradle-project/.
@@ -40,7 +39,7 @@ append_gradle_project :: proc(files: ^[dynamic]GeneratedFile, model: parser.AppM
     })
 
     root_build := strings.concatenate({
-        "// asstudio:generated – root build.gradle\n",
+        "// asstudio:generated - root build.gradle\n",
         "plugins {\n",
         "    id 'com.android.application' version '8.2.2' apply false\n",
         "}\n",
@@ -127,6 +126,4 @@ append_gradle_project :: proc(files: ^[dynamic]GeneratedFile, model: parser.AppM
         path    = "gradle-project/README.md",
         content = readme,
     })
-
-    _ = strconv.parse_int // silence if unused on some Odin versions
 }
