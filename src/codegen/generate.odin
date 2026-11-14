@@ -42,6 +42,13 @@ generate_all :: proc(model: parser.AppModel, templates_dir: string) -> ([dynamic
             user_owned = true,
         })
     }
+
+    // Gradle shell (subfolder; does not disturb Phase-1 golden paths)
+    append_gradle_project(&files, model)
+
+    // Odin engine + Java NativeBridge when a screen asks for a native backend
+    append_native_engine(&files, model)
+
     return files, ""
 }
 
@@ -52,7 +59,7 @@ generate_manifest :: proc(model: parser.AppModel) -> string {
     defer strings.builder_destroy(&b)
     strings.write_string(&b, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
     strings.write_string(&b, "<!-- asstudio:generated v1 DO NOT EDIT -->\n")
-    fmt.sbprint(&b, "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    package=\"%s\">\n\n", model.app.pckg,)
+    fmt.sbprint(&b, "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    package=\"%s\">\n\n", model.app.pckg)
     strings.write_string(&b, "    <application>\n")
     for i := 0; i < len(model.screens); i += 1 {
         s := model.screens[i]
@@ -205,7 +212,6 @@ generate_screen_base :: proc(model: parser.AppModel, s: parser.Screen, class_nam
     for w in s.layout.children {
         if w.on_click != "" && w.id != "" {
             method := strings.concatenate({"on", capitalize(w.on_click)})
-            
             strings.write_string(&b, fmt.tprintf("        %s.setOnClickListener(v -> %s());\n", w.id, method))
         }
     }
@@ -222,7 +228,6 @@ generate_screen_base :: proc(model: parser.AppModel, s: parser.Screen, class_nam
     for w in s.layout.children {
         if w.on_click != "" {
             method := strings.concatenate({"on", capitalize(w.on_click)})
-            //method := "on" + capitalize(w.on_click)
             strings.write_string(&b, fmt.tprintf("    protected abstract void %s();\n\n", method))
         }
     }
@@ -240,20 +245,16 @@ generate_screen_base :: proc(model: parser.AppModel, s: parser.Screen, class_nam
 
 @(private)
 generate_activity :: proc(model: parser.AppModel, s: parser.Screen, class_name: string) -> string {
-    
     b: strings.Builder
     strings.builder_init(&b)
     defer strings.builder_destroy(&b)
-    
     strings.write_string(&b, fmt.tprintf("package %s;\n\n", model.app.pckg))
     strings.write_string(&b, "// User-owned file: asstudio never overwrites it once it exists.\n")
     strings.write_string(&b, "// Handler bodies are yours; the base class is regenerated around them.\n")
     strings.write_string(&b, fmt.tprintf("public class %sActivity extends %sScreenBase {\n", class_name, class_name))
-    
     for w in s.layout.children {
         if w.on_click != "" {
             method := strings.concatenate({"on", capitalize(w.on_click)})
-            //method := "on" + capitalize(w.on_click)
             strings.write_string(&b, fmt.tprintf("    @Override\n    protected void %s() {\n        // TODO: implement %s()\n    }\n", method, method))
         }
     }
@@ -268,7 +269,6 @@ screen_class_name :: proc(id: string) -> string {
 
 @(private)
 package_to_path :: proc(pkg: string) -> string {
-    //two return values, the other a boolen
     pckgd, _ := strings.replace_all(pkg, ".", "/")
     return pckgd
 }
